@@ -53,13 +53,12 @@ The application sends magnet links to Synology Download Station, which handles t
 TorDL/
 ├── main.py
 ├── search_torrent.py
-├── tmdb.py
-├── synology.py
+├── download.py
 ├── assets/
 │   ├── hard-drive-download.png
 │   └── cloud-download.png
 ├── .env
-├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
@@ -81,6 +80,16 @@ Responsibilities include:
 
 Handles torrent searches and returns structured results to the interface.
 
+Handles communication with The Movie Database API.
+
+It can be used to:
+
+- Clean torrent filenames
+- Identify movies
+- Retrieve official movie titles
+- Retrieve poster URLs
+
+
 Example result:
 
 ```python
@@ -93,18 +102,7 @@ Example result:
 }
 ```
 
-### `tmdb.py`
-
-Handles communication with The Movie Database API.
-
-It can be used to:
-
-- Clean torrent filenames
-- Identify movies
-- Retrieve official movie titles
-- Retrieve poster URLs
-
-### `synology.py`
+### `download.py`
 
 Handles communication with the Synology Download Station API.
 
@@ -150,20 +148,7 @@ Install the dependencies with:
 pip install customtkinter pillow requests python-dotenv
 ```
 
-Or:
 
-```bash
-pip install -r requirements.txt
-```
-
-Example `requirements.txt`:
-
-```text
-customtkinter
-Pillow
-requests
-python-dotenv
-```
 
 ## Configuration
 
@@ -172,6 +157,7 @@ Create a `.env` file in the root directory.
 Example:
 
 ```env
+TMDB_TOKEN=your_tmdb_token
 TMDB_API_KEY=your_tmdb_api_key
 
 NAS_URL=https://192.168.1.63:5001
