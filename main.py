@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import Image
 from io import BytesIO
 import requests
 
@@ -40,7 +40,6 @@ def create_movie_row(results_frame, result):
     movie_frame.columnconfigure(1, weight=1)
 
     if result["poster_url"] == None:
-        print("No Poster avalaible")
 
         error_label = ctk.CTkLabel(
             movie_frame,
@@ -59,9 +58,11 @@ def create_movie_row(results_frame, result):
         response = requests.get(result["poster_url"])
         image = Image.open(BytesIO(response.content))
 
-        image = image.resize((70, 105))
-
-        poster = ImageTk.PhotoImage(image)
+        poster = ctk.CTkImage(
+            light_image=image,
+            dark_image=image,
+            size=(70, 105)
+        )
 
         poster_label = ctk.CTkLabel(
             movie_frame,
@@ -69,7 +70,6 @@ def create_movie_row(results_frame, result):
             text=""
         )
 
-        poster_label.image = poster
 
         poster_label.grid(
             row=0,
@@ -157,7 +157,6 @@ def launch_search():
 
         results = search_movie(query)
 
-        print(results)
 
         clear_results()
 

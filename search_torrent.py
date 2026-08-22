@@ -63,13 +63,11 @@ def get_poster(title):
     clean_name = clean_movie_name(title)
 
     if not results:
-        print("Aucun résultat TMDB pour :", clean_name)
         return None
 
     poster_path = results[0].get("poster_path")
 
     if not poster_path:
-        print("Film trouvé mais aucun poster :", clean_name)
         return None
 
     return f"https://image.tmdb.org/t/p/w500{poster_path}"
