@@ -135,7 +135,7 @@ def create_movie_row(results_frame, result):
         width=42,
         height=42,
         corner_radius=6,
-        command=lambda: download_torrent(result["magnet"]),
+        command=lambda: start_download(result["magnet"]),
     )
 
     download_button.pack()
@@ -303,6 +303,66 @@ def refresh_downloads():
         2000,
         refresh_downloads
     )
+
+def show_toast(message, type="info"):
+    toast = ctk.CTkToplevel(root)
+
+    toast.overrideredirect(True)
+    toast.attributes("-topmost", True)
+
+    width = 260
+    height = 60
+
+    root.update_idletasks()
+
+    x = root.winfo_x() + root.winfo_width() - width - 20
+    y = root.winfo_y() + 20
+
+    toast.geometry(f"{width}x{height}+{x}+{y}")
+
+    if type == "success":
+        color = "#2E7D32"
+
+    elif type == "error":
+        color = "#B3261E"
+
+    else:
+        color = "#3A3A3A"
+    
+    frame = ctk.CTkFrame(
+        toast,
+        corner_radius=10,
+        fg_color=color,
+    )
+
+    frame.pack(
+        fill="both",
+        expand=True
+    )
+
+    label = ctk.CTkLabel(
+        frame,
+        text=message,
+        font=("Arial", 13)
+    )
+
+    label.pack(
+        expand=True,
+        padx=15,
+        pady=10
+    )
+
+    toast.after(
+        2500,
+        toast.destroy
+    )
+
+
+def start_download(magnet):
+    response = download_torrent(magnet)
+    if response == True:
+        show_toast("Download started", "success")
+
 
 # =========================
 # HEADER

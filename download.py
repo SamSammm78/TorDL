@@ -53,6 +53,8 @@ def download_torrent(magnet):
         params=params,
         verify=False
     )
+    return response.json()["success"]
+
 
 
 def get_download():
