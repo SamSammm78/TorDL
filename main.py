@@ -2,23 +2,79 @@ import customtkinter as ctk
 from PIL import Image
 from io import BytesIO
 import requests
+import sys
+from pathlib import Path
+
+def resource_path(relative_path):
+    if getattr(sys, "frozen", False):
+        base_path = Path(sys._MEIPASS)
+    else:
+        base_path = Path(__file__).parent
+
+    return base_path / relative_path
 
 from search_torrent import search_movie
-from download import download_torrent, format_downloads, change_download
+from download import download_torrent, format_downloads, change_download, delete_download
 
 
 isResultsPage = True
-
 download_icon = ctk.CTkImage(
-    light_image=Image.open("assets/hard-drive-download.png"),
-    dark_image=Image.open("assets/hard-drive-download.png"),
+    light_image=Image.open(
+        resource_path("assets/hard-drive-download.png")
+    ),
+    dark_image=Image.open(
+        resource_path("assets/hard-drive-download.png")
+    ),
     size=(32, 32)
 )
 
 cloud_icon = ctk.CTkImage(
-    light_image=Image.open("assets/cloud-download.png"),
-    dark_image=Image.open("assets/cloud-download.png"),
-    size=(22, 22)
+    light_image=Image.open(
+            resource_path("assets/cloud-download.png")
+        ),
+        dark_image=Image.open(
+            resource_path("assets/cloud-download.png")
+        ),
+        size=(22, 22)
+)
+
+
+play_icon = ctk.CTkImage(
+    light_image=Image.open(
+            resource_path("assets/play.png")
+        ),
+        dark_image=Image.open(
+            resource_path("assets/play.png")
+        ),
+        size=(22, 22)
+)
+
+pause_icon = ctk.CTkImage(
+    light_image=Image.open(
+            resource_path("assets/pause.png")
+        ),
+        dark_image=Image.open(
+            resource_path("assets/pause.png")
+        ),
+        size=(22, 22)
+)
+stop_icon = ctk.CTkImage(
+    light_image=Image.open(
+            resource_path("assets/stop.png")
+        ),
+        dark_image=Image.open(
+            resource_path("assets/stop.png")
+        ),
+        size=(22, 22)
+)
+check_icon = ctk.CTkImage(
+    light_image=Image.open(
+            resource_path("assets/check.png")
+        ),
+        dark_image=Image.open(
+            resource_path("assets/check.png")
+        ),
+        size=(22, 22)
 )
 
 root = ctk.CTk()
@@ -227,8 +283,65 @@ def create_download_row(parent, download):
         pady=(10, 0)
     )
 
+    action_frame = ctk.CTkFrame(
+    row,
+    fg_color="transparent"
+    )
+
+    action_frame.grid(
+        row=0,
+        column=2,
+        rowspan=2,
+        padx=10,
+        sticky="e"
+    )
+
+    if download["status"] == "paused":
+        resume_icon = play_icon
+    elif download["status"] == "downloading":
+        resume_icon = pause_icon
+    elif download["status"] == "finished":
+        resume_icon = check_icon
+    else:
+        resume_icon = pause_icon
+
     # STATUS
-    status_button = ctk.CTkButton(
+    resume_button = ctk.CTkButton(
+        action_frame,
+        text="",
+        image=resume_icon,
+        font=("Arial", 18),
+        width=32,
+        height=32,
+        corner_radius=6,
+        command=lambda: change_download(download["id"],download["status"])
+    )
+
+    resume_button.grid(
+        row=0,
+        column=0,
+        padx=(0, 2)
+    )
+
+    stop_button = ctk.CTkButton(
+        action_frame,
+        text="",
+        image=stop_icon,
+        font=("Arial", 18),
+        width=32,
+        height=32,
+        corner_radius=6,
+        fg_color="red",
+        command=lambda: delete_download(download["id"], download["status"])
+    )
+
+    stop_button.grid(
+        row=0,
+        column=1,
+        padx=(2, 0)
+    )
+
+    '''status_button = ctk.CTkButton(
         row,
         text=download["status"],
         command=lambda: change_download(download["id"],download["status"])
@@ -239,7 +352,7 @@ def create_download_row(parent, download):
         column=1,
         padx=10,
         pady=(10, 0)
-    )
+    )'''
 
     # PROGRESS BAR
     progress_bar = ctk.CTkProgressBar(row)

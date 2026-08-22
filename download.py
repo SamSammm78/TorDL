@@ -2,16 +2,37 @@ import requests
 import urllib3
 import os
 from dotenv import load_dotenv
-
-load_dotenv()
+import sys
+from pathlib import Path
 
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning
 )
 
+
+def resource_path(relative_path):
+    if getattr(sys, "frozen", False):
+        base_path = Path(sys._MEIPASS)
+    else:
+        base_path = Path(__file__).parent
+
+    return base_path / relative_path
+
+
+load_dotenv(resource_path(".env"))
+
 NAS_URL = os.getenv("NAS_URL")
 NAS_USERNAME = os.getenv("NAS_USERNAME")
 NAS_PASSWORD = os.getenv("NAS_PASSWORD")
+
+if not NAS_URL:
+    raise ValueError("NAS_URL missing")
+
+if not NAS_USERNAME:
+    raise ValueError("NAS_USERNAME missing")
+
+if not NAS_PASSWORD:
+    raise ValueError("NAS_PASSWORD missing")
 
 session = requests.Session()
 
@@ -131,7 +152,6 @@ def pause_download(task_id):
 
 def change_download(task_id, status):
     sid = get_sid()
-    print(task_id, status)
     if status == "downloading":
         params = {
             "api": "SYNO.DownloadStation.Task",
@@ -166,21 +186,25 @@ def change_download(task_id, status):
         return response.json()  
 
     elif status == "finished":
-        params = {
-            "api": "SYNO.DownloadStation.Task",
-            "version": "1",
-            "method": "delete",
-            "id": task_id,
-            "_sid": sid
-        }
-
-        response = requests.get(
-            f"{NAS_URL}/webapi/DownloadStation/task.cgi",
-            params=params,
-            verify=False
-        )
+        
 
         return response.json()
 
-#pause_result = pause_download("dbid_34")
-#print(pause_download)
+
+def delete_download(task_id, status):
+    sid = get_sid()
+    params = {
+        "api": "SYNO.DownloadStation.Task",
+        "version": "1",
+        "method": "delete",
+        "id": task_id,
+        "_sid": sid
+    }
+
+    response = requests.get(
+        f"{NAS_URL}/webapi/DownloadStation/task.cgi",
+        params=params,
+        verify=False
+    )
+
+    return response.json()

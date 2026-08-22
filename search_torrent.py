@@ -3,12 +3,28 @@ import requests
 import urllib
 import os
 from dotenv import load_dotenv
+import sys
+from pathlib import Path
 
-load_dotenv()
+def resource_path(relative_path):
+    if getattr(sys, "frozen", False):
+        base_path = Path(sys._MEIPASS)
+    else:
+        base_path = Path(__file__).parent
+
+    return base_path / relative_path
+
+
+load_dotenv(resource_path(".env"))
 
 TMDB_TOKEN=os.getenv("TMDB_TOKEN")
 TMDB_API_KEY=os.getenv("TMDB_API_KEY")
 
+if not TMDB_TOKEN:
+    raise ValueError("TMDB_TOKEN missing")
+
+if not TMDB_API_KEY:
+    raise ValueError("TMDB_API_KEY missing")
 
 #Nettoyer le titre du film
 def clean_movie_name(raw_name):
@@ -44,6 +60,7 @@ def hex_hash_to_magnet(info_hash: str, display_name: str = None) -> str:
 
 #Récuperation du poster
 def get_poster(title):
+    clean_title = clean_movie_name(title)
     url = "https://api.themoviedb.org/3/search/movie"
 
     headers = {
@@ -52,7 +69,7 @@ def get_poster(title):
     }
     params = {
         "api_key": TMDB_API_KEY,
-        "query": title
+        "query": clean_title
     }
     response = requests.get(url, params=params, timeout=10)
     response.raise_for_status()
@@ -60,7 +77,7 @@ def get_poster(title):
     data = response.json()
     results = data.get("results", [])
 
-    clean_name = clean_movie_name(title)
+    
 
     if not results:
         return None

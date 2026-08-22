@@ -8,6 +8,9 @@
 venv/
 env/
 
+TorDL.iconset/
+TorDL.spec
+
 # Python cache
 __pycache__/
 *.py[cod]
